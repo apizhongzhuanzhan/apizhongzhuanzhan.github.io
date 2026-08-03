@@ -44,7 +44,7 @@ test("data snapshot and generated pagination never exceed 400 stations", async (
 
 test("homepage uses the exact requested title and complete SEO metadata", async () => {
   const html = await pageHtml(1);
-  assert.ok(html.includes("<title>AI 中转站推荐</title>"));
+  assert.ok(html.includes("<title>API 中转站评测与推荐</title>"));
   assert.ok(html.includes('<meta name="description"'));
   assert.ok(html.includes('<meta name="keywords"'));
   assert.ok(html.includes('<meta name="robots" content="index, follow'));
