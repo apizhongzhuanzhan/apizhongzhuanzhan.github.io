@@ -49,7 +49,7 @@ const TOPICS = [
     label: "Codex 中转站",
     short: "Codex",
     terms: ["codex"],
-    intro: "Codex 中转站面向编程 Agent 与仓库任务。短对话可用不代表长任务稳定，应测试工具调用、上下文缓存、并发、错误恢复以及客户端所需的接口能力。",
+    intro: "Codex 中转站面向编程 Agent 与仓库任务。选择时重点体验工具调用、上下文缓存、并发和错误恢复，按客户端需要的接口能力选择线路。",
   },
   {
     slug: "gemini-zhongzhuanzhan",
@@ -77,7 +77,7 @@ const TOPICS = [
     label: "Kimi 中转站",
     short: "Kimi / 月之暗面",
     terms: ["kimi", "moonshot", "月之暗面"],
-    intro: "Kimi 中转站常用于中文长文本、文件处理和对话场景。应核对具体模型、上下文长度、文件能力、工具调用和费用，避免直接用网页会员体验推断 API 能力。",
+    intro: "Kimi 中转站常用于中文长文本、文件处理和对话场景。按模型版本、上下文长度、文件能力、工具调用和费用选择适合任务的线路。",
   },
 ];
 
@@ -215,16 +215,16 @@ function formatDate(value) {
 }
 
 function formatUptime(value) {
-  return value === null ? "暂无" : `${number.format(value)}%`;
+  return value === null ? "—" : `${number.format(value)}%`;
 }
 
 function formatLatency(value) {
-  if (value === null) return "暂无";
+  if (value === null) return "—";
   return value >= 1000 ? `${number.format(value / 1000)} 秒` : `${Math.round(value)} 毫秒`;
 }
 
 function policy(value) {
-  return value === true ? "支持" : value === false ? "不支持" : "待确认";
+  return value === true ? "支持" : value === false ? "不支持" : "—";
 }
 
 function median(values) {
@@ -258,13 +258,13 @@ function fullDescription(text) {
 }
 
 function renderChips(items) {
-  if (!items.length) return '<span class="chip">模型待确认</span>';
+  if (!items.length) return '<span class="chip">模型 —</span>';
   return items.slice(0, 8).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join("");
 }
 
 function renderStation(site) {
   const scoreClass = site.uptime === null ? "score-unknown" : site.uptime >= 99 ? "score-good" : "score-mid";
-  const description = site.description ? `<p class="station-description">${escapeHtml(descriptionSummary(site.description))}</p>` : '<p class="station-description">暂未收录站点简介，访问资料页核对模型、价格与服务条款。</p>';
+  const description = site.description ? `<p class="station-description">${escapeHtml(descriptionSummary(site.description))}</p>` : '<p class="station-description">模型、价格与服务详情见站点资料页。</p>';
   const details = site.description.length > 130 ? `<details class="ranking-rules"><summary><span class="rules-title">查看完整公开简介</span></summary><div class="rules-body">${fullDescription(site.description)}</div></details>` : "";
   return `<article class="station-card" id="rank-${site.rank}" data-station-card aria-labelledby="station-${site.rank}">
     <span class="rank-number" aria-label="推荐顺序第 ${site.rank} 名">${site.rank}</span>
@@ -273,7 +273,7 @@ function renderStation(site) {
       ${description}
       <div class="station-meta"><span>延迟 <strong>${formatLatency(site.latencyMs)}</strong></span><span>模型 <strong>${site.modelCount} 个</strong></span><span>评价 <strong>${site.userRating !== null && site.ratingCount ? `${number.format(site.userRating)}/5 · ${site.ratingCount} 条` : "暂无"}</strong></span></div>
       <div class="chips">${renderChips(site.models)}</div>
-      <div class="station-actions"><a class="detail-link" href="${escapeHtml(site.url)}" target="_blank" rel="nofollow noopener" referrerpolicy="origin">查看公开资料</a><span class="policy">退款：${policy(site.supportsRefund)} · 发票：${policy(site.supportsInvoice)}</span><span class="policy">支付：${escapeHtml(site.paymentMethods.join(" / ") || "待确认")}</span></div>
+      <div class="station-actions"><a class="detail-link" href="${escapeHtml(site.url)}" target="_blank" rel="nofollow noopener" referrerpolicy="origin">查看公开资料</a><span class="policy">退款：${policy(site.supportsRefund)} · 发票：${policy(site.supportsInvoice)}</span><span class="policy">支付：${escapeHtml(site.paymentMethods.join(" / ") || "—")}</span></div>
       ${details}
     </div>
     <div class="station-score ${scoreClass}"><strong>${formatUptime(site.uptime)}</strong><span>公开在线率</span></div>
@@ -301,7 +301,7 @@ function topicMatches(site, topic) {
 
 function renderTopics(allSites) {
   return `<section class="content-section" id="topics" aria-labelledby="topics-title">
-    <div class="section-heading"><div><p class="section-kicker">07 / 按模型选择</p><h2 id="topics-title">你需要哪种模型？</h2></div><p>GPT中转站、Gemini中转站和GLM中转站的接口能力各有差异。先看下面的用途与核对要点，再按模型查找候选站点。</p></div>
+    <div class="section-heading"><div><p class="section-kicker">07 / 按模型选择</p><h2 id="topics-title">你需要哪种模型？</h2></div><p>GPT中转站、Gemini中转站和GLM中转站的接口能力各有差异。按下面的用途与接入要点选择模型，再查看对应的推荐站点。</p></div>
     <div class="topic-grid">${TOPICS.map((topic) => {
       const count = allSites.filter((site) => topicMatches(site, topic)).length;
       return `<a class="topic-card" href="/${topic.slug}/"><small>${escapeHtml(topic.short)}</small><h3>${escapeHtml(topic.label)}</h3><p>${escapeHtml(topic.intro)}</p><strong>${count} 家相关站点 →</strong></a>`;
@@ -314,7 +314,7 @@ function objectiveSummary(site) {
   if (site.uptime !== null) parts.push(`公开在线率 ${formatUptime(site.uptime)}`);
   if (site.latencyMs !== null) parts.push(`平均延迟 ${formatLatency(site.latencyMs)}`);
   parts.push(`收录模型 ${site.modelCount} 个`);
-  return `${parts.join("；")}。公开信息仅用于初筛。`;
+  return `${parts.join("；")}。`;
 }
 
 function jsonLdForPage({ page, canonical, title, description, sites, allSites, built }) {
@@ -361,24 +361,24 @@ function renderPage({ page, totalPages, sites, allSites, built }) {
   <header class="site-header"><div class="header-inner"><a class="brand" href="/" aria-label="中转站指南首页"><span class="brand-mark">API</span><span>中转站指南</span></a><nav class="site-nav" aria-label="主要导航"><a href="/#ranking">精选清单</a><a href="/#topics">模型指南</a><a href="/#guide">怎么选</a><a href="/#faq">常见问题</a></nav></div></header>
   <main id="main">
     <nav class="breadcrumbs" aria-label="面包屑"><a href="/">中转站指南</a><span aria-hidden="true">/</span><span aria-current="page">完整目录第 ${page} 页</span></nav>
-    <section class="hero"><p class="eyebrow">AI API DIRECTORY / ${allSites.length} SITES</p><h1>API中转站完整目录<br /><span>第 ${page} 页</span></h1><p class="hero-copy">按来源的原始排名展示候选站点。用在线率、延迟、模型覆盖和服务政策初筛，再测试你的真实任务。</p><ul class="hero-meta"><li>本次更新 <time datetime="${built.iso}">${built.visible}</time></li><li>共 ${allSites.length} 家 · 本页 ${sites.length} 家</li><li><a href="/#guide">阅读完整选站指南 →</a></li></ul></section>
+    <section class="hero"><p class="eyebrow">AI API DIRECTORY / ${allSites.length} SITES</p><h1>API中转站完整目录<br /><span>第 ${page} 页</span></h1><p class="hero-copy">按原始排名展示API中转站。在线率、响应速度、模型覆盖和服务政策集中对比，方便选择日常使用与项目接入的服务。</p><ul class="hero-meta"><li>本次更新 <time datetime="${built.iso}">${built.visible}</time></li><li>共 ${allSites.length} 家 · 本页 ${sites.length} 家</li><li><a href="/#guide">阅读完整选站指南 →</a></li></ul></section>
     <section id="ranking" aria-labelledby="ranking-title"><div class="ranking-toolbar"><div><p class="section-kicker">DIRECTORY / ${String(page).padStart(2, "0")}</p><h2 id="ranking-title">AI API 中转站推荐列表</h2><p>当前显示第 ${first}–${last} 名，共 ${allSites.length} 家</p></div><div class="search-box"><label for="station-search">筛选当前页（显示 <span data-visible-count>${sites.length}</span> 家）</label><input id="station-search" type="search" inputmode="search" autocomplete="off" placeholder="输入站点名、模型或支付方式" data-station-search /></div></div>
-      <p class="ranking-note">数据来自公开目录，按原始排名排序；缺失信息不作推测。在线率、延迟和评价不能单独证明模型真实性或长期稳定性，请在充值前核对最新模型、价格、退款和隐私政策。</p>
+      <p class="ranking-note">按所需模型、响应速度与服务条件筛选。需要退款、发票或对公支付时，可直接查看每家站点对应的信息。</p>
       <section class="page-analysis" aria-label="本页数据概览"><h3>本页数据概览</h3><dl class="analysis-grid"><div><dt>在线率中位数</dt><dd>${pageStats.uptime.value === null ? "暂无" : formatUptime(pageStats.uptime.value)}</dd><small>有效样本 ${pageStats.uptime.sample}/${sites.length}</small></div><div><dt>延迟中位数</dt><dd>${pageStats.latency.value === null ? "暂无" : formatLatency(pageStats.latency.value)}</dd><small>有效样本 ${pageStats.latency.sample}/${sites.length}</small></div><div><dt>模型数量中位数</dt><dd>${pageStats.models.value === null ? "暂无" : `${number.format(pageStats.models.value)} 个`}</dd><small>有效样本 ${pageStats.models.sample}/${sites.length}</small></div><div><dt>评分中位数</dt><dd>${pageStats.rating.value === null ? "暂无" : `${number.format(pageStats.rating.value)} / 5`}</dd><small>有效样本 ${pageStats.rating.sample}/${sites.length}</small></div></dl></section>
       <div class="station-list">${sites.map(renderStation).join("")}</div><div class="search-empty" data-search-empty role="status">当前页没有匹配结果，请尝试更短的关键词。</div>${renderPagination(page, totalPages)}
     </section>
-    <section class="continue-card"><h2>从候选名单到实际选择</h2><p>回到首页查看上游来源、倍率与充值、缓存计费、模型用途、选择方法和常见问题。</p><a href="/#guide">阅读完整选择指南 →</a></section>
+    <section class="continue-card"><h2>选好模型，开始接入</h2><p>回到首页查看上游来源、倍率与充值、缓存计费、模型用途、选择方法和常见问题。</p><a href="/#guide">阅读完整选择指南 →</a></section>
   </main>
-  <footer class="site-footer"><div class="footer-inner"><div><a class="brand" href="/">中转站指南</a><p>公开资料用于初筛；先小额测试，后决定长期使用。</p></div><a href="#main">返回顶部 ↑</a></div></footer>
+  <footer class="site-footer"><div class="footer-inner"><div><a class="brand" href="/">中转站指南</a><p>API中转站推荐、模型对比与接入指南，每天自动更新两次。</p></div><a href="#main">返回顶部 ↑</a></div></footer>
   <script src="${root}/assets/site.js" defer></script>
 </body></html>`;
 }
 
 function topicFaq(topic) {
   return [
-    [`${topic.label}应该怎么选？`, `先确认站点明确支持所需模型和接口，再用自己的真实任务测试流式输出、工具调用、上下文、成功率和账单。不要只依据首页价格或一次短对话决定长期使用。`],
+    [`${topic.label}应该怎么选？`, `按所需模型、接口和预算选择站点，接入后体验流式输出、工具调用与上下文。用真实任务比较响应速度、完成效果和最终扣费。`],
     [`${topic.label}价格怎样比较？`, "统一换算人民币充值比例、输入价格、输出价格、缓存读写、模型倍率和用户分组倍率，再复算一条实际请求。"],
-    [`${topic.label}可以直接用于生产环境吗？`, "个人学习可以先小额测试；生产环境还要评估数据隐私、运营主体、日志政策、限流、故障公告、合同责任和备用供应商。"],
+    [`${topic.label}可以直接用于生产环境吗？`, "生产项目按并发、数据处理与服务要求选择分组，配置独立密钥、用量限额和备用线路。团队接入时一并查看日志设置、服务条款和对接支持。"],
   ];
 }
 
@@ -386,16 +386,16 @@ function renderTopicPage({ topic, matches, allSites, built }) {
   const shown = matches.slice(0, PAGE_SIZE);
   const canonical = `${ORIGIN}/${topic.slug}/`;
   const title = `${topic.label}推荐｜API 中转站评测与推荐`;
-  const description = `${topic.label}专题收录 ${matches.length} 家相关 AI API 中转站公开资料，对比在线率、延迟、模型数量，并提供计费、能力验证和风险选择指南。`;
+  const description = `${topic.label}专题收录 ${matches.length} 家相关 AI API 中转站公开资料，对比在线率、延迟、模型数量，并提供计费比较与接入指南。`;
   const topicStats = stats(matches);
   const faq = topicFaq(topic);
   const jsonLd = JSON.stringify({ "@context": "https://schema.org", "@graph": [
     { "@type": "CollectionPage", "@id": `${canonical}#webpage`, url: canonical, name: title, description, inLanguage: "zh-CN", dateModified: built.iso, mainEntity: { "@id": `${canonical}#ranking` } },
     { "@type": "BreadcrumbList", "@id": `${canonical}#breadcrumb`, itemListElement: [{ "@type": "ListItem", position: 1, name: "API 中转站评测与推荐", item: `${ORIGIN}/` }, { "@type": "ListItem", position: 2, name: topic.label, item: canonical }] },
-    { "@type": "ItemList", "@id": `${canonical}#ranking`, name: `${topic.label}候选列表`, numberOfItems: matches.length, itemListElement: shown.map((site, index) => ({ "@type": "ListItem", position: index + 1, item: { "@type": "Service", name: site.name, url: site.url, description: objectiveSummary(site) } })) },
+    { "@type": "ItemList", "@id": `${canonical}#ranking`, name: `${topic.label}推荐列表`, numberOfItems: matches.length, itemListElement: shown.map((site, index) => ({ "@type": "ListItem", position: index + 1, item: { "@type": "Service", name: site.name, url: site.url, description: objectiveSummary(site) } })) },
     { "@type": "FAQPage", mainEntity: faq.map(([question, answer]) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })) },
   ] }).replaceAll("<", "\\u003c");
-  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>${escapeHtml(title)}</title><meta name="description" content="${escapeHtml(description)}" /><meta name="keywords" content="${escapeHtml(topic.label)},${escapeHtml(topic.short)},API 中转站评测与推荐,API 中转站排名" /><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="theme-color" content="#ffffff" /><meta property="og:type" content="website" /><meta property="og:locale" content="zh_CN" /><meta property="og:site_name" content="API 中转站评测与推荐" /><meta property="og:title" content="${escapeHtml(title)}" /><meta property="og:description" content="${escapeHtml(description)}" /><meta property="og:url" content="${canonical}" /><meta property="og:image" content="${ORIGIN}/assets/og-image.svg" /><meta name="twitter:card" content="summary_large_image" /><link rel="canonical" href="${canonical}" /><link rel="alternate" hreflang="zh-CN" href="${canonical}" /><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" /><link rel="stylesheet" href="../assets/styles.min.css" /><script type="application/ld+json">${jsonLd}</script>${BAIDU_TONGJI_SCRIPT}</head><body data-generated-at="${built.iso}"><a class="skip-link" href="#main">跳到主要内容</a><header class="site-header"><div class="header-inner"><a class="brand" href="../"><span class="brand-mark">API</span><span>API 中转站评测与推荐</span></a><nav class="site-nav" aria-label="主要导航"><a href="../#ranking">排行榜</a><a href="../#topics">模型专题</a><a href="../#guide">怎么选</a><a href="#faq">常见问题</a></nav></div></header><main id="main"><nav class="breadcrumbs" aria-label="面包屑"><a href="../">API 中转站评测与推荐</a><span aria-hidden="true">/</span><span aria-current="page">${escapeHtml(topic.label)}</span></nav><section class="hero topic-hero"><p class="eyebrow">MODEL DIRECTORY · ${escapeHtml(topic.short)}</p><h1>${escapeHtml(topic.label)}<br /><span>推荐与对比</span></h1><p class="hero-copy topic-intro">${escapeHtml(topic.intro)}</p><ul class="hero-meta"><li>${matches.length} 家相关站点</li><li>展示前 ${shown.length} 家</li><li>更新 <time datetime="${built.iso}">${built.visible}</time></li></ul></section><dl class="topic-highlight"><div><dt>相关站点</dt><dd>${matches.length} 家</dd></div><div><dt>在线率中位数</dt><dd>${topicStats.uptime.value === null ? "暂无" : formatUptime(topicStats.uptime.value)}</dd></div><div><dt>延迟中位数</dt><dd>${topicStats.latency.value === null ? "暂无" : formatLatency(topicStats.latency.value)}</dd></div><div><dt>模型数量中位数</dt><dd>${topicStats.models.value === null ? "暂无" : `${number.format(topicStats.models.value)} 个`}</dd></div></dl><section aria-labelledby="topic-ranking-title"><div class="ranking-toolbar"><div><p class="section-kicker">MODEL RANKING</p><h2 id="topic-ranking-title">${escapeHtml(topic.label)}候选站</h2><p>按综合推荐顺序展示匹配站点，模型与线路请在充值前复核。</p></div><div class="search-box"><label for="station-search">筛选当前专题（显示 <span data-visible-count>${shown.length}</span> 家）</label><input id="station-search" type="search" placeholder="输入站点名或模型" data-station-search /></div></div><p class="ranking-note">公开资料提及相关模型不代表当前通道始终可用，也不代表官方授权。请测试具体模型版本、协议、上下文、工具调用、账单和高峰期稳定性。</p><div class="station-list">${shown.map(renderStation).join("")}</div><div class="search-empty" data-search-empty>当前专题没有匹配结果。</div></section><section class="content-section editorial"><h2>选择 ${escapeHtml(topic.label)} 的验证重点</h2><div class="editorial-body"><h3>核对协议和模型映射</h3><p>${escapeHtml(topic.intro)} 不要把“兼容 OpenAI”直接理解为保留全部原生能力，应逐项测试错误格式、流式响应、工具调用、缓存和模型标识。</p><h3>用长任务而不是问候语测试</h3><p>使用真实文档、代码仓库或多轮 Agent 任务，记录首字时间、完整耗时、失败率、上下文截断、重试次数和单次扣费。换时间段复测，才能发现高峰期排队和账号池切换问题。</p><h3>为生产调用准备退路</h3><p>把接口地址、模型映射和密钥配置集中管理，确保能快速切换到官方 API 或第二供应商。敏感数据、强 SLA 和不可重试任务不应只依赖无法审计的第三方链路。</p></div></section><section class="content-section" id="faq"><div class="section-heading"><div><p class="section-kicker">FAQ</p><h2>${escapeHtml(topic.label)}常见问题</h2></div><p>模型、价格和政策会变化，最终以站点实时说明和自己的请求级测试为准。</p></div><div class="faq-list">${faq.map(([question, answer]) => `<details class="faq-item"><summary>${escapeHtml(question)}</summary><div class="faq-answer"><p>${escapeHtml(answer)}</p></div></details>`).join("")}</div></section>${renderTopics(allSites)}</main><footer class="site-footer"><div class="footer-inner"><div><a class="brand" href="../"><span class="brand-mark">API</span><span>API 中转站评测与推荐</span></a><p>公开资料用于初筛；先小额测试，后决定长期使用。</p></div><a href="#main">返回顶部 ↑</a></div></footer><script src="../assets/site.js" defer></script></body></html>`;
+  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>${escapeHtml(title)}</title><meta name="description" content="${escapeHtml(description)}" /><meta name="keywords" content="${escapeHtml(topic.label)},${escapeHtml(topic.short)},API 中转站评测与推荐,API 中转站排名" /><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" /><meta name="theme-color" content="#ffffff" /><meta property="og:type" content="website" /><meta property="og:locale" content="zh_CN" /><meta property="og:site_name" content="API 中转站评测与推荐" /><meta property="og:title" content="${escapeHtml(title)}" /><meta property="og:description" content="${escapeHtml(description)}" /><meta property="og:url" content="${canonical}" /><meta property="og:image" content="${ORIGIN}/assets/og-image.svg" /><meta name="twitter:card" content="summary_large_image" /><link rel="canonical" href="${canonical}" /><link rel="alternate" hreflang="zh-CN" href="${canonical}" /><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" /><link rel="stylesheet" href="../assets/styles.min.css" /><script type="application/ld+json">${jsonLd}</script>${BAIDU_TONGJI_SCRIPT}</head><body data-generated-at="${built.iso}"><a class="skip-link" href="#main">跳到主要内容</a><header class="site-header"><div class="header-inner"><a class="brand" href="../"><span class="brand-mark">API</span><span>API 中转站评测与推荐</span></a><nav class="site-nav" aria-label="主要导航"><a href="../#ranking">排行榜</a><a href="../#topics">模型专题</a><a href="../#guide">怎么选</a><a href="#faq">常见问题</a></nav></div></header><main id="main"><nav class="breadcrumbs" aria-label="面包屑"><a href="../">API 中转站评测与推荐</a><span aria-hidden="true">/</span><span aria-current="page">${escapeHtml(topic.label)}</span></nav><section class="hero topic-hero"><p class="eyebrow">MODEL DIRECTORY · ${escapeHtml(topic.short)}</p><h1>${escapeHtml(topic.label)}<br /><span>推荐与对比</span></h1><p class="hero-copy topic-intro">${escapeHtml(topic.intro)}</p><ul class="hero-meta"><li>${matches.length} 家相关站点</li><li>展示前 ${shown.length} 家</li><li>更新 <time datetime="${built.iso}">${built.visible}</time></li></ul></section><dl class="topic-highlight"><div><dt>相关站点</dt><dd>${matches.length} 家</dd></div><div><dt>在线率中位数</dt><dd>${topicStats.uptime.value === null ? "暂无" : formatUptime(topicStats.uptime.value)}</dd></div><div><dt>延迟中位数</dt><dd>${topicStats.latency.value === null ? "暂无" : formatLatency(topicStats.latency.value)}</dd></div><div><dt>模型数量中位数</dt><dd>${topicStats.models.value === null ? "暂无" : `${number.format(topicStats.models.value)} 个`}</dd></div></dl><section aria-labelledby="topic-ranking-title"><div class="ranking-toolbar"><div><p class="section-kicker">MODEL RANKING</p><h2 id="topic-ranking-title">${escapeHtml(topic.label)}推荐站点</h2><p>按综合排名展示相关站点，集中比较模型、响应速度与服务政策。</p></div><div class="search-box"><label for="station-search">筛选当前专题（显示 <span data-visible-count>${shown.length}</span> 家）</label><input id="station-search" type="search" placeholder="输入站点名或模型" data-station-search /></div></div><p class="ranking-note">按完整模型名和接口选择线路，编程场景重点看缓存与工具调用，文档和多模态场景重点看上下文与输入能力。</p><div class="station-list">${shown.map(renderStation).join("")}</div><div class="search-empty" data-search-empty>当前专题没有匹配结果。</div></section><section class="content-section editorial"><h2>选择 ${escapeHtml(topic.label)} 的接入要点</h2><div class="editorial-body"><h3>核对协议和模型映射</h3><p>${escapeHtml(topic.intro)} 根据客户端使用的协议查看流式响应、工具调用、缓存与模型 ID，接入配置更清楚。</p><h3>用真实任务体验</h3><p>使用真实文档、代码仓库或多轮 Agent 任务，记录首字时间、完整耗时、任务完成情况和单次扣费。按自己的常用时段体验，找到速度与成本合适的分组。</p><h3>管理项目配置与备用线路</h3><p>把接口地址、模型映射和密钥集中管理，给项目配置用量限额和备用线路。团队项目按数据处理、并发与服务要求选择分组，后续维护更方便。</p></div></section><section class="content-section" id="faq"><div class="section-heading"><div><p class="section-kicker">FAQ</p><h2>${escapeHtml(topic.label)}常见问题</h2></div><p>从模型选择、价格比较到项目接入，下面是常用的操作方法。</p></div><div class="faq-list">${faq.map(([question, answer]) => `<details class="faq-item"><summary>${escapeHtml(question)}</summary><div class="faq-answer"><p>${escapeHtml(answer)}</p></div></details>`).join("")}</div></section>${renderTopics(allSites)}</main><footer class="site-footer"><div class="footer-inner"><div><a class="brand" href="../"><span class="brand-mark">API</span><span>API 中转站评测与推荐</span></a><p>API中转站推荐、模型对比与接入指南，每天自动更新两次。</p></div><a href="#main">返回顶部 ↑</a></div></footer><script src="../assets/site.js" defer></script></body></html>`;
 }
 
 function minifyHtml(html) {
