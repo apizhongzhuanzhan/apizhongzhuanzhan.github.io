@@ -42,7 +42,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- data.json index.html page sitemap.xml assets/styles.min.css gpt-zhongzhuanzhan claude-zhongzhuanzhan codex-zhongzhuanzhan gemini-zhongzhuanzhan glm-zhongzhuanzhan qwen-zhongzhuanzhan kimi-zhongzhuanzhan
+          git add -- data.json index.html directory page sitemap.xml assets/styles.min.css gpt-zhongzhuanzhan claude-zhongzhuanzhan codex-zhongzhuanzhan gemini-zhongzhuanzhan glm-zhongzhuanzhan qwen-zhongzhuanzhan kimi-zhongzhuanzhan
           if git diff --cached --quiet; then
             echo "No changes"
             exit 0
