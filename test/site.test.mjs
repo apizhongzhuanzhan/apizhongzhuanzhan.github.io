@@ -45,7 +45,7 @@ test("data snapshot and generated pagination never exceed 400 stations", async (
 
 test("homepage has complete SEO metadata describing the guide and top 20", async () => {
   const html = await readFile(path.join(root, "index.html"), "utf8");
-  assert.match(html, /<title>AI中转站推荐与使用指南[^<]*前20名[^<]*<\/title>/);
+  assert.match(html, /<title>API中转站推荐与使用指南[^<]*前20名[^<]*<\/title>/);
   assert.ok(html.includes('<meta name="description"'));
   assert.ok(html.includes('<meta name="keywords"'));
   assert.ok(html.includes('<meta name="robots" content="index, follow'));

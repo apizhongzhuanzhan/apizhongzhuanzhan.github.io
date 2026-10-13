@@ -42,8 +42,8 @@ function heading(index, title, text) {
 export function renderHomepage({ allSites, built, topicsHtml, analytics }) {
   const sites = allSites.slice(0, 20);
   const origin = "https://apizhongzhuanzhan.github.io";
-  const title = "AI中转站推荐与使用指南｜API中转站前20名、榜单与选站方法";
-  const description = "AI中转站、API中转站推荐与使用指南：按公开排名精选前20家，提供禾维AI与AI API Rank榜单入口，讲清GPT、Gemini、GLM中转站怎么选、倍率充值、缓存计费、Kiro逆向与常见问题。";
+  const title = "API中转站推荐与使用指南｜前20名、榜单与选站方法";
+  const description = "API中转站推荐与使用指南：按公开排名精选前20家AI中转站，提供禾维AI与AI API Rank榜单入口，讲清GPT、Gemini、GLM中转站怎么选、倍率充值、缓存计费、Kiro逆向与常见问题。";
   const toc = [["ranking", "站点清单"], ["what", "中转站是什么"], ["types", "三种服务类型"], ["price", "倍率与充值"], ["guide", "怎么选"], ["risk", "使用与避坑"], ["topics", "按模型选择"], ["faq", "常见问题"]];
   const jsonLd = JSON.stringify({ "@context": "https://schema.org", "@graph": [
     { "@type": "WebSite", "@id": `${origin}/#website`, url: `${origin}/`, name: "API 中转站评测与推荐", inLanguage: "zh-CN" },
@@ -65,7 +65,7 @@ export function renderHomepage({ allSites, built, topicsHtml, analytics }) {
     <a class="skip-link" href="#main">跳到主要内容</a>
     <header class="site-header"><div class="header-inner"><a class="brand" href="/" aria-label="中转站指南首页"><span class="brand-mark">API</span><span>中转站指南</span></a><nav class="site-nav" aria-label="主要导航"><a href="#ranking">站点清单</a><a href="#price">倍率与充值</a><a href="#guide">怎么选</a><a href="#faq">常见问题</a><a href="/directory/">完整目录 ↗</a></nav></div></header>
     <main id="main">
-      <section class="guide-hero" aria-labelledby="home-title"><p class="eyebrow">2026 / AI API RELAY GUIDE</p><h1 id="home-title">AI中转站推荐，<br /><span>选站之前把账算明白。</span></h1><p class="hero-copy">先看值得长期用的 API中转站候选与聚合榜单，再了解上游来源、倍率、充值和缓存。把候选名单变成一次有依据的选择。</p><div class="hero-bottom"><p>本次更新 <time datetime="${built.iso}">${built.visible}</time><br />精选 ${sites.length} 家 · 完整目录 ${allSites.length} 家 · 每天自动更新两次</p><a class="guide-button" href="#ranking">查看站点清单 <span aria-hidden="true">↓</span></a></div></section>
+      <section class="guide-hero" aria-labelledby="home-title"><p class="eyebrow">2026 / AI API RELAY GUIDE</p><h1 id="home-title">API中转站推荐，<br /><span>选站之前把账算明白。</span></h1><p class="hero-copy">先看值得长期用的 API中转站候选与聚合榜单，再了解上游来源、倍率、充值和缓存。把候选名单变成一次有依据的选择。</p><div class="hero-bottom"><p>本次更新 <time datetime="${built.iso}">${built.visible}</time><br />精选 ${sites.length} 家 · 完整目录 ${allSites.length} 家 · 每天自动更新两次</p><a class="guide-button" href="#ranking">查看站点清单 <span aria-hidden="true">↓</span></a></div></section>
       <div class="reading-layout"><aside class="reading-sidebar"><nav aria-label="本页目录"><p>本页内容</p>${toc.map(([id, label], index) => `<a href="#${id}"><span>${String(index + 1).padStart(2, "0")}</span>${label}</a>`).join("")}<a class="toc-directory" href="/directory/">浏览 ${allSites.length} 家目录 ↗</a></nav><p class="sidebar-note">先小额测试。<br />用自己的任务，<br />确认适合自己的线路。</p></aside>
       <div class="reading-content">
         <section class="guide-section" id="ranking" aria-labelledby="ranking-title">
